@@ -83,6 +83,72 @@
               "Recommendation 6: Protect log integrity with write-once or off-host logging, since the attackers used malware designed to delete evidence."
             ]
           }
+        },
+        {
+          "slug": "capcom-id-breach-2026-10-22",
+          "title": "Capcom confirms CAPCOM ID breach: 11.7M account records accessed and 196 passwords changed without owners' consent",
+          "date": "2026-10-22",
+          "category": "Data Breach / Customer Identity Platform",
+          "sourceName": "Security Magazine (reporting Capcom's notice)",
+          "sourceUrl": "https://www.securitymagazine.com/articles/102681-11m-impacted-by-capcom-breach-some-facing-unauthorized-changes",
+          "image": "assets/images/capcom-breach-thumbnail.png",
+          "summary": "In plain English: an unauthorized party got into Capcom's online account system (CAPCOM ID), the single login used across Capcom's websites, forums and online multiplayer. On October 22, 2026 Capcom confirmed that 11,774,247 account records were accessed, mostly email addresses plus login metadata such as account creation time, last login time, login count and the IP address of the most recent login. A smaller group was hit harder: 43 records also exposed dates of birth, gender, country or region and nicknames, and 196 accounts had their login passwords changed without the owners' consent. Capcom says credit card data was not affected, that customers' original passwords have not been confirmed as compromised, and that games remain playable. The way the attackers got in has not been publicly disclosed, and Capcom says it has identified and addressed the attack method. Figures are as of the October 22, 2026 disclosure and may change as the investigation continues.",
+          "attackChain": [
+            {
+              "stage": "Initial Access",
+              "description": "Not publicly confirmed. Capcom says it identified and addressed the attack method, but has not described how the unauthorized party gained access to the CAPCOM ID service."
+            },
+            {
+              "stage": "Execution",
+              "description": "In plain English: the attacker read account records and changed some passwords. Capcom confirmed that an unauthorized party accessed 11,774,247 CAPCOM ID records and that login passwords on 196 accounts were changed without the owners' authorization. Whether this happened through the public application, an internal administrative interface or direct database access has not been disclosed."
+            },
+            {
+              "stage": "Persistence",
+              "description": "Not publicly confirmed. Capcom says it detected suspicious activity on October 19, began blocking the access and confirmed the unauthorized access the same day. No details have been published about how long the attacker held access or whether any backdoors were found."
+            },
+            {
+              "stage": "Impact",
+              "description": "Confidentiality: email addresses and system-specific account data (creation date/time, last login date/time, number of logins, client IP address from the most recent login) across 11.7 million records, plus dates of birth, gender, country or region and nicknames in 43 of them. Integrity: 196 accounts had their login passwords changed without the owners' consent, and Capcom reset them. Not affected, according to Capcom: credit card information, and players' ability to access or play games. Capcom has not confirmed that customers' originally chosen passwords were compromised."
+            }
+          ],
+          "timeline": [
+            {
+              "date": "2026-10-19",
+              "event": "Capcom detects suspicious activity on CAPCOM ID, starts blocking the access and confirms unauthorized access the same day."
+            },
+            {
+              "date": "2026-10-20",
+              "event": "Capcom forms an internal incident response team; the data access and the unauthorized password changes are confirmed (one outlet dates the team's formation to October 21)."
+            },
+            {
+              "date": "2026-10-21",
+              "event": "Capcom reports the incident to the Osaka Prefectural Police and to Japan's Personal Information Protection Commission."
+            },
+            {
+              "date": "2026-10-22",
+              "event": "Capcom publishes its public notice and apology, stating that 11,774,247 records were affected, that emergency response measures are complete, and that it has identified and addressed the attack method. It warns users about fraudulent emails claiming to come from Capcom."
+            }
+          ],
+          "impact": "Confirmed: 11,774,247 CAPCOM ID records accessed; email addresses and login metadata exposed; 43 records also exposed date of birth, gender, country or region and nickname; 196 accounts had passwords changed without authorization and were reset. Capcom reports no credit card data affected, no confirmed compromise of customers' original passwords, and no effect on players' ability to play its games. Unknown or not stated in the sources reviewed: the attack method, how long the attacker had access, how the 196 password changes were carried out, and whether the 43 more detailed records were specifically targeted.",
+          "response": "Capcom detected the activity, blocked the access, formed an incident response team and reported to the Osaka Prefectural Police and Japan's Personal Information Protection Commission within two days of detection. It reset the passwords on the 196 affected accounts, published a public apology and notice within three days, and warned users about phishing emails impersonating Capcom. Capcom states that emergency response measures are complete and that it has identified and addressed the attack method, while monitoring and investigation continue.",
+          "rootCause": "The root cause has not been publicly confirmed. Capcom says it identified and addressed the attack method but has not disclosed it. Some security analysts have hypothesized weaknesses in how account changes are authorized, such as flaws in session handling, authorization checks or account recovery, because the 196 password changes occurred without confirmed compromise of the original passwords. These are hypotheses, not findings.",
+          "observations": {
+            "lessons": [
+              "Lesson 1: Integrity failures matter as much as data exposure. The 196 unauthorized password changes mean attackers altered accounts, not just read them. Because original passwords are not confirmed compromised, the way the system accepted those changes is the key question (an analyst hypothesis; Capcom has not said).",
+              "Lesson 2: A shared identity service has a large blast radius. CAPCOM ID is the single sign-in for Capcom's web services, forums and online multiplayer, so one weakness there reaches everything attached to it.",
+              "Lesson 3: Metadata that looks harmless still has value to attackers. Email addresses combined with last-login times and IP-derived location make convincing phishing messages possible, which is why Capcom warned users about fraudulent emails.",
+              "Lesson 4: Fast detection and disclosure limited the uncertainty. Capcom went from detection on October 19 to regulator and police reports on October 21 and a public notice on October 22, which is good practice, though the cause remains undisclosed.",
+              "Lesson 5: Small, more sensitive subsets of a breach need separate attention. The 43 records with dates of birth, gender and nicknames carry higher risk of targeted social engineering than the bulk of the data."
+            ],
+            "recommendations": [
+              "Recommendation 1: Require re-authentication, ideally with phishing-resistant methods such as passkeys or WebAuthn, before sensitive account changes such as password or email updates.",
+              "Recommendation 2: Enforce authorization checks on every account-modifying request (the requester must be allowed to change that specific account), and log every password change and recovery event with enough detail to investigate.",
+              "Recommendation 3: Harden account recovery with short-lived, single-use reset tokens bound to the requesting session, plus rate limits and delays on recovery requests.",
+              "Recommendation 4: Add behavioral anomaly detection on account changes, such as password changes from a new region or device, or request sequences that do not look like a human using the website.",
+              "Recommendation 5: Limit privileged access to user records with least privilege, role-based access and a second approval for credential resets by support staff or service accounts.",
+              "Recommendation 6: Practice data minimization and monitor for brand-impersonation phishing after an incident, with clear user guidance on how to check an account safely."
+            ]
+          }
         }
       ]
     }
