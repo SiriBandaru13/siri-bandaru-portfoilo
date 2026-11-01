@@ -1,4 +1,3 @@
-
 {
   "currentEdition": "2026-11-01",
   "editions": [
@@ -8,17 +7,84 @@
       "title": "Security Briefing — November 1, 2026",
       "stories": [
         {
-          "slug": "binance-security-incident",
-          "title": "Binance investigates reported security incident",
+          "slug": "binance-hot-wallet-heist-2026-10-29",
+          "title": "Binance loses about $6.36B in the largest crypto heist on record; FBI names North Korea's TraderTraitor",
           "date": "2026-10-29",
-          "category": "Exchange Security",
-          "sourceName": "Binance",
-          "sourceUrl": "https://www.binance.com/en/support/announcement/detail/c5a8729a97ac486d963784d96c5642d7",
+          "category": "Cryptocurrency Exchange Breach / Nation-State Theft",
+          "sourceName": "TRM Labs",
+          "sourceUrl": "https://www.trmlabs.com/resources/blog/north-korea-steals-usd-6-36-billion-from-binance-in-the-largest-hack-in-history",
           "image": "assets/images/binance.png",
-          "summary": "Binance published an initial update concerning a reported security incident. Details about the incident and its possible technical cause should be treated as preliminary until confirmed through official updates.",
-           }
-      ],
-      "observations": []
+          "summary": "In plain English: the attackers did not break into Binance's vault. They took control of the systems that approve withdrawals and made them send the money to the attackers' own wallets. About $6.36 billion left Binance wallets across ten blockchains on October 29, 2026, most of it in roughly 20 minutes, making it the largest crypto theft on record (about four times the 2025 Bybit hack). TRM Labs and the FBI attribute the attack to TraderTraitor, a North Korean state-sponsored unit. Binance's preliminary finding points to a compromised DevOps engineer's laptop, but the full root cause has not been published. Stablecoin issuers and Arbitrum froze about $2.7 billion; Binance says user funds are safe and that it will cover all losses. Figures are as of November 1, 2026 and may change as the investigation continues.",
+          "attackChain": [
+            {
+              "stage": "Initial Access",
+              "description": "Not fully confirmed. In plain English: Binance's preliminary finding is that attackers compromised the work laptop of a DevOps engineer and used it to reach an internal service container that was allowed to submit withdrawal requests. Binance reported no evidence that any wallet private key was leaked; the fraudulent requests produced valid signatures. Binance later said further investigation found additional points of breach beyond the laptop. How the laptop itself was compromised has not been publicly confirmed."
+            },
+            {
+              "stage": "Execution",
+              "description": "In plain English: the attackers rehearsed first, then emptied the wallets in minutes. Preparation: from October 28, small Tornado Cash withdrawals (a service that hides the source of crypto) funded an operator wallet; the attack code was tested on two wallets and rehearsed on a third, then installed on a Binance hot wallet (the internet-connected wallet used for customer withdrawals) about four hours later. On Ethereum, one transaction carried 50 pre-signed EIP-7702 authorizations. EIP-7702 lets a wallet hand control of its behaviour to a smart contract, and here every authorization pointed to a sweeper contract that only the attacker could instruct. Preparing 50 consecutive transaction counts (nonces) guaranteed one would match on a busy wallet. About three and a half minutes later the attacker drained 167,464 ETH and 63 tokens, including 1.615 billion USDT. On nine other blockchains, Binance wallets sent funds through ordinary signed transfers within about half an hour. TRM assesses this points to a compromise of Binance's wallet signing infrastructure (an analyst assessment, not confirmed by Binance)."
+            },
+            {
+              "stage": "Persistence",
+              "description": "In plain English: the attacker kept control of the hot wallet and emptied it again whenever new money arrived. The EIP-7702 delegation stayed active, and the operator swept new funds repeatedly through the night (20:41, 20:59, 21:04, 21:44, 22:39 and 23:56 UTC). The same wallet also acted as the executor of a separate Binance smart account, which let the attacker pull 823 million USDC before Circle froze it. Ripple and World Liberty Financial froze assets in the compromised wallet so that new deposits could not be swept."
+            },
+            {
+              "stage": "Defense Evasion",
+              "description": "Binance's leadership said the attack involved malicious software designed to delete evidence of its activity, which made the investigation harder. The staging, including Tornado Cash funding of the operator wallet, also obscured who was behind the preparation."
+            },
+            {
+              "stage": "Impact",
+              "description": "About $6.36 billion was moved out of Binance wallets across ten blockchains (Binance's own estimate is about $6.3 billion). Ethereum accounted for about $3.79 billion, Bitcoin for 18,270 BTC (about $1.47 billion), and the rest came from Tron, the XRP Ledger, Solana and five other networks. After the theft, the attacker raced the freezes by selling USDT to market makers at a discount of more than 10% and borrowing ETH against USDT on Aave, while Bitcoin was split through a peel chain (repeated transfers that make funds harder to follow). As of October 30, TRM reported the attacker still held about $2.4 billion in assets beyond any issuer's reach. The FBI warned that further laundering is expected."
+            }
+          ],
+          "timeline": [
+            {
+              "date": "2026-10-28",
+              "event": "Small Tornado Cash withdrawals fund the attacker's operator wallet, according to TRM Labs."
+            },
+            {
+              "date": "2026-10-29",
+              "event": "Attack code is tested on two wallets, rehearsed on a third, and installed on a Binance hot wallet about four hours later. Thefts begin at 20:05 UTC on the XRP Ledger; at 20:20 UTC the 50 EIP-7702 authorizations are submitted on Ethereum; funds leave wallets on ten blockchains within about 20 minutes, with a second wave around 23:05 UTC on Avalanche and Polygon."
+            },
+            {
+              "date": "2026-10-29",
+              "event": "Stablecoin freezes begin: Tether freezes 971.1 million USDT at 21:01 UTC and Circle freezes 823 million USDC at 21:04 UTC. Binance suspends withdrawals, says its estimated impact is about $6.3 billion, and states that user funds are safe and that losses will be covered."
+            },
+            {
+              "date": "2026-10-30",
+              "event": "Binance's preliminary finding points to a compromised DevOps engineer's laptop that reached a service container able to submit withdrawals, with no evidence of a private key leak. Binance later reports additional points of breach."
+            },
+            {
+              "date": "2026-10-31",
+              "event": "The FBI attributes the attack to TraderTraitor, a North Korean state-sponsored unit, and warns that the stolen assets are being converted mainly into Ethereum with further laundering expected."
+            },
+            {
+              "date": "2026-11-01",
+              "event": "Binance begins resuming withdrawals in phases, with the first phase between 06:00 and 09:00 GMT."
+            }
+          ],
+          "impact": "Confirmed: about $6.36 billion moved out of Binance wallets across ten blockchains (TRM's figure; Binance estimates about $6.3 billion), the largest crypto theft on record. About $2.7 billion has been frozen by Tether, Circle, Ripple, World Liberty Financial and Arbitrum's Security Council, and the attacker still held about $2.4 billion as of October 30. Withdrawals were suspended and then resumed in phases from November 1; Binance says deposits were unaffected, user funds are safe, and it will cover all losses. Unknown: the final amount recovered, the full laundering path, and the complete list of systems affected.",
+          "response": "Binance suspended withdrawals, worked with law enforcement, blockchain intelligence firms, token issuers and other exchanges to trace and recover funds, and revoked affected permissions. It said it was rebuilding the withdrawal service and would not switch it back on until it passed rigorous testing. Tether, Circle, Ripple, World Liberty Financial and Arbitrum's Security Council froze assets within hours. Binance reported replacing about 90% of the stolen amount from company funds (some outlets report 95%) and promised a technical report. The FBI attributed the attack to TraderTraitor and asked exchanges and blockchain analytics firms to block transactions linked to the attacker's addresses.",
+          "rootCause": "The root cause has not been publicly confirmed. Binance's preliminary finding is that a compromised DevOps engineer's laptop gave an attacker access to a service container used to submit withdrawals, with no evidence of a wallet private key leak. Binance later said it found additional points of breach. TRM Labs assesses that the attacker gained the ability to make Binance's hot wallet signing infrastructure sign transactions of their choosing across multiple chains (an analyst assessment, not a confirmed finding).",
+          "observations": {
+            "lessons": [
+              "Lesson 1: Attackers targeted the approval path, not the vault. The withdrawals carried valid signatures and no private key was reported leaked, so the authority to request and approve payments needs the same protection as the keys themselves.",
+              "Lesson 2: Privileged engineers' endpoints are high-value targets. Binance's preliminary finding is that a single DevOps laptop was the starting point, which shows how one workstation can reach systems that move billions.",
+              "Lesson 3: One compromise reached ten blockchains. In TRM's assessment, wallets with different keys and signing schemes all produced valid signatures for the attacker within about half an hour, which suggests signing infrastructure was not segmented enough by chain and wallet tier.",
+              "Lesson 4: The attack was staged for at least 36 hours, with test deployments, a rehearsal and Tornado Cash funding. These were detectable precursors, not only a theft in progress.",
+              "Lesson 5: Fast, coordinated freezes limited the damage, but assets that no issuer can freeze, such as ETH and BTC, stayed with the attacker. Speed of response matters, and it has limits."
+            ],
+            "recommendations": [
+              "Recommendation 1: Harden and isolate privileged engineering endpoints with EDR, hardware-backed authentication and separate admin workstations, and restrict which services and containers can reach the withdrawal signing path.",
+              "Recommendation 2: Put an independent transaction policy layer in front of signing, with destination allowlists, per-chain and rolling velocity limits, and human or out-of-band approval above thresholds.",
+              "Recommendation 3: Separate signing infrastructure and approval paths by chain and wallet tier, so that one compromise cannot produce valid signatures everywhere.",
+              "Recommendation 4: Monitor treasury wallets for unexpected EIP-7702 delegations and alert on bulk authorizations across a range of transaction counts, and keep a tested, pre-approved method for signing a revocation.",
+              "Recommendation 5: Detect staging activity by alerting on new contract code on hot wallets, test transactions and funding from mixers, and rehearse incident response with pre-arranged contacts at stablecoin issuers and chains for rapid freezes.",
+              "Recommendation 6: Protect log integrity with write-once or off-host logging, since the attackers used malware designed to delete evidence."
+            ]
+          }
+        }
+      ]
     }
   ]
 }
