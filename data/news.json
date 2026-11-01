@@ -1,4 +1,26 @@
+
 {
-  "currentEdition": null,
-  "editions": []
+  "currentEdition": "2026-11-01",
+  "editions": [
+    {
+      "id": "2026-11-01",
+      "date": "2026-11-01",
+      "title": "Security Briefing — November 1, 2026",
+      "stories": [
+        {
+          "slug": "binance-security-incident",
+          "title": "Binance investigates reported security incident",
+          "date": "2026-10-29",
+          "category": "Exchange Security",
+          "sourceName": "Binance",
+          "sourceUrl": "https://www.binance.com/en/support/announcement/detail/c5a8729a97ac486d963784d96c5642d7",
+          "image": "assets/images/binance.png",
+          "summary": "Binance published an initial update concerning a reported security incident. Details about the incident and its possible technical cause should be treated as preliminary until confirmed through official updates.",
+          "observation": "This incident highlights why organizations must secure developer endpoints, internal infrastructure and privileged access—not just customer-facing applications.",
+          "takeaway": "Use endpoint detection and response, least-privilege access, secure developer environments, credential protection and centralized security monitoring."
+        }
+      ],
+      "observations": []
+    }
+  ]
 }
