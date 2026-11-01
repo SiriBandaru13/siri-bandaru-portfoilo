@@ -118,3 +118,20 @@ body.modal-open{overflow:hidden}
 @media(max-width:760px){.home-hero{min-height:650px;padding-top:90px;align-items:flex-start}.hero-copy{max-width:100%}.hero-visual{right:-90px;top:230px;opacity:.25;transform:scale(.8)}.home-hero h1{font-size:clamp(45px,10vw,66px)}.hero-foot{margin-top:30px}.quick-strip{grid-template-columns:repeat(2,1fr)}.quick-strip>div:nth-child(2){border-right:0}.quick-strip>div:nth-child(-n+2){border-bottom:1px solid var(--line)}.section{padding:58px 7vw}.project-cards{grid-template-columns:1fr}.project-info p{min-height:0}.skill-groups{grid-template-columns:1fr}.journal-cta{margin:15px 7vw 55px;padding:38px 28px}.cta-mark{right:-70px;opacity:.22}.storygrid{grid-template-columns:repeat(2,minmax(0,1fr))}.story-thumb{height:135px}.obs{grid-template-columns:1fr}}
 @media(max-width:520px){.home-hero{padding:70px 22px 80px;min-height:620px}.home-hero h1{font-size:46px}.hero-foot{font-size:8px;gap:13px}.scroll-cue{left:22px}.quick-strip{margin:0 22px 15px}.quick-strip>div{padding:15px}.quick-strip strong{font-size:18px}.quick-strip span{font-size:9px}.section{padding:48px 22px}.journal-cta{margin:12px 22px 45px}.journalhero{padding:70px 22px 50px;min-height:350px}.journalhero h1{font-size:45px}.journal-meta{font-size:8px;gap:8px}.edition-head{align-items:flex-start;flex-direction:column;gap:7px}.storygrid{grid-template-columns:1fr}.story-thumb{height:175px}#modalContent{padding:23px 20px 20px}.modal-image{height:165px}.story-modal{padding:10px}.story-dialog{max-height:94vh}.modal-topline{font-size:8px}.modal-navigation{gap:6px}.nav-story{padding:8px;font-size:10px}}
 @media(prefers-reduced-motion:reduce){.status-dot,.availability i,.visual-orbit,.thumb-art:before,.thumb-art:after,.cloud-core,.scan-line,.cta-mark:before,.cta-mark:after{animation:none!important}}
+
+/* Structured incident investigation report */
+.modal-body section{padding:19px 0;border-top:1px solid var(--line)}
+.modal-body section>small{display:block;margin-bottom:13px;color:var(--sage);font:9px var(--mono);letter-spacing:.14em}
+.modal-body h3{font:700 17px var(--display);margin:20px 0 10px}
+.modal-body h4{font:700 14px var(--display);margin:0 0 5px}
+.attack-chain{display:grid;gap:11px}
+.analysis-step{display:grid;grid-template-columns:35px 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:8px;background:#ffffff06}
+.step-number{color:var(--violet);font:12px var(--mono)}
+.analysis-step p,.timeline-event p{margin:0;font-size:13px;color:var(--muted)}
+.incident-timeline{border-left:1px solid var(--violet);margin:5px 0 5px 5px;padding-left:20px;display:grid;gap:17px}
+.timeline-event{position:relative}.timeline-event:before{content:"";position:absolute;left:-25px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--sage)}
+.timeline-event time{font:11px var(--mono);color:var(--violet)}
+.observations-panel{padding:20px!important;border:1px solid #9c7bcb55!important;border-radius:9px;background:#34243f55}
+.observations-panel ul{padding-left:20px;color:var(--muted);font-size:13px}.observations-panel li{margin:0 0 9px;padding-left:4px}
+#story>.story-image{width:100%;max-height:340px;object-fit:cover;border-radius:9px;margin:20px 0}
+@media(max-width:520px){.analysis-step{grid-template-columns:27px 1fr;padding:12px}}
