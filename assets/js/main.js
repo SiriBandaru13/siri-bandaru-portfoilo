@@ -1,1 +1,19 @@
-(()=>{let y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();let p=document.querySelector('.progress');function up(){if(p){let m=document.documentElement.scrollHeight-innerHeight;p.style.width=(m>0?scrollY/m*100:0)+'%'}}addEventListener('scroll',up,{passive:true});up();if('IntersectionObserver'in window){let io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}}),{threshold:.08});document.querySelectorAll('.reveal').forEach(e=>io.observe(e))}else document.querySelectorAll('.reveal').forEach(e=>e.classList.add('visible'))})();
+(()=>{let y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();
+      let p=document.querySelector('.progress');
+      function up(){
+        if(p){
+          let m=document.documentElement.scrollHeight-innerHeight;
+          p.style.width=(m>0?scrollY/m*100:0)+'%'
+        }
+      }
+      addEventListener('scroll',up,{passive:true});
+      up();
+      if('IntersectionObserver'in window){
+        let io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');
+        io.unobserve(e.target)}}),{threshold:.08});
+        document.querySelectorAll('.reveal').forEach(e=>io.observe(e))
+      }
+      else 
+        document.querySelectorAll('.reveal').forEach(e=>e.classList.add('visible'))
+     }
+)();
