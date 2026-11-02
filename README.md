@@ -4,7 +4,7 @@ A personal portfolio showcasing my cybersecurity learning journey, hands-on proj
 
 The portfolio combines a professional profile with a security journal where I explore cybersecurity news, analyze security incidents, and document defensive security takeaways.
 
-🌐 **Live Portfolio:** [Add your Vercel URL here]  
+🌐 **Live Portfolio:** [siribandaru](https://siribandaru.vercel.app/)
 💻 **GitHub:** [SiriBandaru13](https://github.com/SiriBandaru13)
 
 ---
