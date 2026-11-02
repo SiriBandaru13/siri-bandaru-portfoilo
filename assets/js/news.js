@@ -1,16 +1,18 @@
 async function init(){
  let data;try{data=await(await fetch('data/news.json')).json()}catch{return}
  const editions=(data.editions||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
- let current=editions.find(e=>e.id===data.currentEdition)||editions[0],activeEdition=current,activeStories=[],activeIndex=0;
+ let current=editions.find(e=>e.id===data.currentEdition)||editions[0],activeEdition=current,activeStories=[],activeIndex=0,currentFilter='all';
  const latest=document.getElementById('latest'),archive=document.getElementById('archive');
  const modal=document.getElementById('storyModal'),modalContent=document.getElementById('modalContent');
+ document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{currentFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));if(activeEdition)renderEdition(activeEdition)}));
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const safeUrl=x=>{try{const u=new URL(x,location.href);return ['http:','https:'].includes(u.protocol)?u.href:'#'}catch{return '#'}};
  const imageMarkup=s=>{let src=s.image?safeUrl(s.image):'';return src&&src!=='#'?`<img src="${src}" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-image');this.remove()">`:`<div class="thumb-art"><span>${esc((s.category||'SECURITY').toUpperCase())}</span><b>⌁</b><i>FIELD NOTE</i></div>`};
  function renderEdition(e){
   if(!e||!latest)return;activeEdition=e;activeStories=(e.stories||[]).slice(0,5);
+  const visibleStories=activeStories.filter(s=>currentFilter==='all'||String(s.category||'').toLowerCase().includes(currentFilter));
   latest.innerHTML=`<div class="edition-head"><div><span class="section-kicker">${esc(e.date||'')}</span><h2>${esc(e.title||'Security briefing')}</h2></div><span class="edition-count">${activeStories.length} / 5 STORIES</span></div>`+
-   (activeStories.length?`<div class="storygrid">${activeStories.map((s,i)=>`<button class="storycard" type="button" data-story-index="${i}" aria-label="Open ${esc(s.title)}"><div class="story-thumb">${imageMarkup(s)}</div><div class="story-card-copy"><small>${esc(s.category||'SECURITY')} · ${esc(s.date||e.date||'')}</small><h3>${esc(s.title||'Untitled incident')}</h3><span class="card-open">OPEN FIELD NOTE <b>↗</b></span></div></button>`).join('')}</div>`:`<div class="empty"><h2>No stories in this edition yet.</h2><p>Add up to five researched stories to this edition in data/news.json.</p></div>`);
+   (visibleStories.length?`<div class="storygrid">${visibleStories.map((s)=>`<button class="storycard" type="button" data-story-index="${activeStories.indexOf(s)}" aria-label="Open ${esc(s.title)}"><div class="story-thumb">${imageMarkup(s)}</div><div class="story-card-copy"><small>${esc(s.category||'SECURITY')} · ${esc(s.date||e.date||'')}</small><h3>${esc(s.title||'Untitled incident')}</h3><span class="card-open">OPEN FIELD NOTE <b>↗</b></span></div></button>`).join('')}</div>`:`<div class="empty"><h2>No stories in this edition yet.</h2><p>Add up to five researched stories to this edition in data/news.json.</p></div>`);
   latest.querySelectorAll('[data-story-index]').forEach(b=>b.addEventListener('click',()=>openStory(Number(b.dataset.storyIndex))));
  }
  function renderArchive(){
