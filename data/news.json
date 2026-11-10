@@ -1,5 +1,5 @@
 {
-  "currentEdition": "2026-11-01",
+  "currentEdition": "2026-11-10",
   "editions": [
     {
       "id": "2026-11-01",
@@ -150,236 +150,241 @@
             ]
           }
         }
-      [
-        {
-      "slug": "emudhra-ca-key-compromise-java-emergency-update-2026-10-20",
-      "title": "eMudhra's CA keys were cracked in milliseconds, and Oracle ships emergency Java updates to distrust them",
-      "date": "2026-10-20",
-      "category": "Certificate Authority Compromise / Java Trust Store",
-      "sourceName": "Mozilla CA Incident Report (Bugzilla 2083449)",
-      "sourceUrl": "https://bugzilla.mozilla.org/show_bug.cgi?id=2083449",
-      "image": "assets/images/emudhra-java.png",
-      "summary": "A certificate authority (CA) is a company that browsers and programs trust to vouch for websites. eMudhra, an Indian CA, created eight intermediate CA certificates in April 2025 using badly generated private keys. The keys were so weak that anyone could work them out from the public certificates in moments. Whoever holds such a key can mint a fake HTTPS certificate for any website, and software that trusts eMudhra's chain would accept it. A researcher reported the problem on October 17, 2026, and Mozilla made it public on October 20. Chrome and Firefox blocked the certificates the same evening, and Apple and Microsoft followed within days. Java and many other non-browser tools do not check revocation or Certificate Transparency by default, so Oracle issued emergency Java updates that remove trust in the affected certificates. Six of the eight intermediates issued TLS certificates and two were for code signing. No fraudulent certificate had been logged in Certificate Transparency when Chrome blocked the keys, but the keys are public, so non-browser clients remain the exposed group until they are updated. Figures and CVE identifiers are as of November 10, 2026 and may change.",
-      "attackChain": [
-        {
-          "stage": "Initial Access",
-          "description": "There was no break-in. In plain English: the weakness was built into the keys themselves. eMudhra says a script error caused its issuing CAs to be created with weak keys. Mozilla's report describes the P-384 private keys of the eight intermediates as tiny integers that can be recovered almost instantly, and Cisco Talos describes several as single-digit or double-digit numbers instead of the 384 bits of randomness expected. Anyone with the public certificates could derive the private keys."
-        },
-        {
-          "stage": "Execution",
-          "description": "A security researcher recovered the keys and reported them on October 17, 2026, along with proof that the keys were in third-party hands (a message signed with each intermediate's private key). Mozilla says several people independently recovered the keys, and researchers have since published them. One researcher also reported recovering the keys with a simple prompt to an AI agent. No source reviewed confirms that anyone used the keys to attack a real target."
-        },
-        {
-          "stage": "Persistence",
-          "description": "The risk lasts as long as software still trusts the eMudhra chain. Browsers pushed blocks quickly (Chrome through a CRLSet update on the evening of October 17, Mozilla through OneCRL), but many non-browser clients such as curl, Python, Node, Go and Java trust a CA bundle stored on disk and, by default, do not check revocation or Certificate Transparency. Frozen snapshots of older root stores, container images and bundled JDKs can keep the old trust. Oracle's Java advisory covers Java SE 8, 11, 17, 21, 25 and 27 plus GraalVM, and it was later expanded to products that bundle or embed Java."
-        },
-        {
-          "stage": "Impact",
-          "description": "Potential impact: an attacker holding a key could issue a certificate for any website or service and intercept or tamper with encrypted traffic from clients that still trust the chain, for example a Java application connecting to an API or a build server downloading dependencies. Two of the eight intermediates were for code signing. Confirmed: browsers blocked the six TLS intermediates, and Chrome reported that none of them had issued any certificate logged to Certificate Transparency before the block, so Certificate Transparency-enforcing browsers could not have been attacked. Not confirmed: whether anyone abused the keys against clients that do not check Certificate Transparency."
-        }
-      ],
-      "timeline": [
-        {
-          "date": "2025-04-01",
-          "event": "eMudhra creates the eight intermediate CA certificates with the weak keys (April 2025, according to Endor Labs' analysis of the incident)."
-        },
-        {
-          "date": "2026-10-17",
-          "event": "A researcher reports the compromised keys to Apple, Google, Microsoft, Mozilla and eMudhra. Chrome blocks the six TLS intermediates by CRLSet at about 19:45 UTC. Mozilla receives the report at 20:06 UTC and starts blocking through OneCRL."
-        },
-        {
-          "date": "2026-10-20",
-          "event": "Mozilla and Chrome's Root Program publish the incident. Mozilla removes the eMudhra root in an NSS update and Microsoft blocks the certificates. eMudhra also revoked the intermediates (it says within 14 hours of confirming the issue), and fixes such as the Composer ca-bundle update appear."
-        },
-        {
-          "date": "2026-10-21",
-          "event": "Oracle publishes an emergency Java security alert that distrusts the affected intermediate certificates. Japan's IPA warns that exploitation could crash applications or let an attacker take control of a computer."
-        },
-        {
-          "date": "2026-10-24",
-          "event": "Oracle's advisory for the JSSE flaw (CVSS 9.1, remotely exploitable without authentication) lists Java SE 8u511, 11.0.33, 17.0.21, 21.0.13, 25.0.5 and 27.0.1 plus GraalVM. Oracle expands the advisory on October 30 to products that bundle Java."
-        },
-        {
-          "date": "2026-10-26",
-          "event": "eMudhra publishes a statement from its leadership saying the flaw was its own, caused by a script error, and that the root keys were not affected."
-        }
-      ],
-      "impact": "Confirmed: private keys of eight eMudhra intermediate CA certificates (six for TLS, two for code signing) were recoverable by anyone and have been published. Chrome, Firefox, Apple and Microsoft blocked them, eMudhra revoked them, and Oracle shipped Java updates that remove trust in them. Chrome found no certificates from the six TLS intermediates logged in Certificate Transparency before its block. Oracle's advisory rates the Java issue CVSS 9.1. Sources reviewed do not say that attackers exploited the Java issue in the wild. Unknown: whether the keys were abused against clients that do not check revocation or Certificate Transparency, and how many Java deployments, container images and embedded products still trust the old chain. Note on identifiers: Oracle's own alert page lists CVE-2026-114820, while several outlets cite CVE-2026-91403 for the October 21 alert, so check Oracle's page for the current identifier.",
-      "response": "Chrome blocked the six TLS intermediates within hours, Mozilla blocked them through OneCRL and later removed the root, and Apple and Microsoft followed. eMudhra revoked the intermediates and published a statement taking responsibility. Oracle released emergency Java updates for Java SE 8 through 27 and GraalVM that stop trusting the affected certificates, and later widened the advisory to products embedding Java. Other ecosystems shipped fixes too, including a Go crypto/x509 change tracked as CVE-2026-111943 and a refreshed Composer ca-bundle.",
-      "rootCause": "The root cause is a defect in how eMudhra generated the private keys for eight intermediate CAs. eMudhra attributes it to a script error. The keys had almost no randomness, so they could be recovered from the public certificates. Why the error was not caught during key generation or issuance has not been fully explained in the sources reviewed.",
-      "observations": {
-        "lessons": [
-          "Lesson 1: A trusted certificate chain is only as strong as the weakest key in it. The weak keys were created in April 2025 and the problem surfaced only in October 2026 after a researcher scanned public certificates.",
-          "Lesson 2: Browsers and Java do not get protected at the same speed. Chrome and Firefox pushed blocks within hours, but Java needed a runtime update, because many non-browser clients trust a file on disk and skip revocation and Certificate Transparency checks.",
-          "Lesson 3: Java runtimes hide in many places. The advisory was expanded to products that bundle Java, so patching the JDK on a laptop does not cover container images, vendor appliances or custom trust stores.",
-          "Lesson 4: Certificate Transparency made the difference for browsers. No certificate from the six TLS intermediates had been logged before the block, which is why CT-enforcing browsers could not have been attacked.",
-          "Lesson 5: Public disclosure moves fast. Mozilla says several people independently recovered the keys, and they were published within days, which shrinks the time defenders have to update."
-        ],
-        "recommendations": [
-          "Recommendation 1: Apply the October 2026 Oracle Java updates (or the matching OpenJDK vendor builds) and rebuild container images and bundled runtimes, so every JVM that your applications use distrusts the eMudhra intermediates.",
-          "Recommendation 2: Inventory every Java trust store (the cacerts file, custom truststores and bundled JREs in vendor products) and compare them against the distrust list, since frozen older root stores can still carry the old chain.",
-          "Recommendation 3: Where services make sensitive outbound connections, consider enabling revocation checking in the Java client (for example the OCSP and CRL settings) and certificate pinning for high-value endpoints.",
-          "Recommendation 4: Monitor Certificate Transparency logs for certificates issued for your own domains, and alert on unexpected issuers or unlogged certificates.",
-          "Recommendation 5: Add CA-compromise scenarios to your vulnerability management and incident response plans, with a tested way to push trust-store changes quickly across servers, containers and endpoints."
-          ]
-        }
-      },
+      ]
+    },
     {
-      "slug": "fireworks-ai-cloud-provider-breach-2026-11-09",
-      "title": "Fireworks AI says attackers reached its development machines through a third-party cloud provider, widening an October breach",
-      "date": "2026-11-09",
-      "category": "Cloud Provider Compromise / AI Platform Breach",
-      "sourceName": "Cyber Security News (reporting Fireworks AI's security bulletin)",
-      "sourceUrl": "https://cybersecuritynews.com/fireworks-ai-data-breach/",
-      "image": "assets/images/fireworks-ai.png",
-      "summary": "Fireworks AI, a company that hosts and runs AI models for customers, first reported in October that an attacker misused its internal credentials. On November 9, 2026 it said the incident was wider. A cloud provider that hosts its research and development machines had its own security incident on October 23, and on October 24 an unauthorized party used that opening to reach Fireworks development machines and run an unauthorized workload. Fireworks now confirms that attackers also saw customer account and billing details and, for some customers, parts of unfinished model weights and datasets. Fireworks says payment card numbers are not stored and that its Inference, Training SDK and Nexus services showed no impact. Its evidence points to a financially motivated group that sells access to large language models, a practice called LLMjacking. The cloud provider has not been named, and the investigation continues. Figures are as of the November 9, 2026 update and may change.",
-      "attackChain": [
+      "id": "2026-11-10",
+      "date": "2026-11-10",
+      "title": "Security Briefing — November 10, 2026",
+      "stories": [
         {
-          "stage": "Initial Access",
-          "description": "Two openings are described. First, on October 6 Fireworks detected misuse of internal credentials; how the attacker obtained them has not been disclosed. Second, on October 23 a third-party cloud provider that hosts Fireworks research and development machines had a security incident, and on October 24 an unauthorized party used that to reach Fireworks development machines. The provider has not been named and the specific vulnerabilities have not been disclosed."
-        },
-        {
-          "stage": "Execution",
-          "description": "In the first phase, the attacker read environment variables used by evaluation jobs, which could have exposed API keys and tokens. In the second phase, the attacker ran an unauthorized workload on the development machines, which led to further customer data exposure. Fireworks says it detected the second activity on the day it happened and closed known critical vulnerabilities."
-        },
-        {
-          "stage": "Persistence",
-          "description": "Not publicly confirmed. Fireworks says it detected no further successful attacker access to its customer platform as of October 25. It revoked affected API keys, employee credentials and service-account tokens, replaced credentials, reduced elevated permissions, isolated affected systems and tightened storage access. How long the attacker held access in total has not been published."
-        },
-        {
-          "stage": "Impact",
-          "description": "Confidentiality: resource identifiers, names, descriptions and creation times from an internal application; billing and shipping addresses, invoices, payment history, balances and credit usage; and, for certain customers, a subset of incomplete model weights and datasets. Fireworks says it does not store payment card numbers, so those were not affected, and it reports no impact on Inference, Training SDK or Nexus, which run with zero data retention by default. The disclosure does not establish that complete production models were stolen. Fireworks has disabled self-service dataset uploads and downloads for Batch Inference and dataset-based training while it investigates."
-        }
-      ],
-      "timeline": [
-        {
-          "date": "2026-10-06",
-          "event": "Fireworks detects misuse of internal credentials. Attackers accessed environment variables used by evaluation jobs, potentially capturing API keys and tokens."
-        },
-        {
-          "date": "2026-10-07",
-          "event": "Fireworks begins notifying customers and later revokes affected keys, employee credentials and service-account tokens."
-        },
-        {
-          "date": "2026-10-23",
-          "event": "A cloud provider that hosts Fireworks research and development machines experiences a security incident."
-        },
-        {
-          "date": "2026-10-24",
-          "event": "An unauthorized party uses that opening to access Fireworks development machines and run an unauthorized workload. Fireworks detects the activity the same day and responds."
-        },
-        {
-          "date": "2026-10-25",
-          "event": "Fireworks reports no further detected successful attacker access to its customer platform."
-        },
-        {
-          "date": "2026-11-09",
-          "event": "Fireworks publishes an updated bulletin confirming wider customer data exposure, including billing information and parts of incomplete model weights and datasets, and says it has brought in Palo Alto Networks Unit 42 and notified law enforcement."
-        }
-      ],
-      "impact": "Confirmed by Fireworks: customer account metadata and billing information exposed; a subset of incomplete model weights and datasets accessed for certain customers; API keys and tokens potentially exposed in the earlier phase. Fireworks says payment card numbers are not stored and that Inference, Training SDK and Nexus were not affected. Unknown or not stated: the number of affected customers, the name of the cloud provider, how the internal credentials were first obtained, and whether the two phases were one continuous intrusion.",
-      "response": "Fireworks notified law enforcement, engaged Palo Alto Networks Unit 42 for forensics, revoked and replaced credentials, reduced elevated permissions, isolated affected systems and tightened storage access. It is notifying affected customers directly and advises them to replace revoked Fireworks keys, rotate any exposed third-party credentials with their issuing providers (deleting a stored secret does not invalidate the credential itself), and review access logs, users, API keys, training jobs and datasets for unfamiliar activity. It disabled self-service dataset uploads and downloads for Batch Inference and dataset-based training, and moved Fireworks Lab training runs into an isolated environment with extra network and storage protection.",
-      "rootCause": "The root cause has not been publicly confirmed. Fireworks attributes the second phase to a security incident at a third-party cloud provider hosting its research and development machines, and the first phase to misuse of internal credentials. It has not named the provider or described the weaknesses involved. Fireworks says its evidence points to a financially motivated group seeking to sell access to large language models through illicit routing gateways.",
-      "observations": {
-        "lessons": [
-          "Lesson 1: A breach can be wider than the first disclosure. Fireworks first reported exposed secrets in evaluation jobs and later found a second path that exposed customer data, so early scoping needs to stay open.",
-          "Lesson 2: Your provider's incident becomes your incident. The second phase began with a security problem at a cloud provider hosting development machines, which shows why third-party risk includes the infrastructure you run on.",
-          "Lesson 3: Environment variables are a rich target. Evaluation jobs held API keys and tokens, and one read of those variables can unlock many other systems.",
-          "Lesson 4: Customers inherit the clean-up. Deleting a stored secret does not invalidate it, so customers have to rotate credentials with the original issuer.",
-          "Lesson 5: Stolen AI and cloud access has a resale market. Fireworks' evidence points to LLMjacking, where access to paid models is sold through routing gateways, so stolen credentials can show up as unexpected usage bills."
-        ],
-        "recommendations": [
-          "Recommendation 1: Keep secrets out of long-lived environment variables where possible. Use a secrets manager with short-lived, narrowly scoped tokens, and rotate quickly when any exposure is suspected.",
-          "Recommendation 2: Treat development and research machines as production-adjacent. Apply least privilege, network isolation and logging, and limit what a compromised host or provider account can reach.",
-          "Recommendation 3: Monitor for unexpected workloads and usage, such as new jobs, unfamiliar users, unusual API usage and cost spikes, and set billing alerts as an early warning for stolen credentials.",
-          "Recommendation 4: Review third-party and cloud-provider dependencies, including how the provider notifies you of its own incidents and what access its staff and systems have to your machines.",
-          "Recommendation 5: When a vendor reports an incident, rotate the credentials you gave it with their original issuers, and review access logs, API keys, users, jobs and datasets for activity you do not recognize."
-          ]
-        }
-      },
-      {
-        "slug": "digicert-archived-data-exposure-2026-11-05",
-        "title": "DigiCert confirms an exposed internal system leaked customer contact details and identity documents",
-        "date": "2026-11-05",
-        "category": "Data Breach / Misconfigured Internal System",
-        "sourceName": "Cyber Security News (reporting DigiCert's incident report)",
-        "sourceUrl": "https://cybersecuritynews.com/digicert-confirms-data-breach/",
-        "image": "assets/images/digicert.png",
-        "summary": "DigiCert, one of the world's largest certificate authorities, moved an internal business system in February 2025, and the move accidentally made it reachable from the internet. The system also allowed anyone to register an account, and those accounts were not forced to use the multi-factor authentication required for staff. Accounts with no application assigned still received read-only access to archived customer information. Investigators found that unauthorized access happened between June 27 and July 2, 2026, and DigiCert confirmed the data access on October 19, 2026. Exposed data includes names, business email addresses, phone numbers and business addresses, and for a small minority of accounts passports, driver's licenses, utility bills or other documents showing names and addresses. DigiCert says its certificate authority services, CertCentral and DigiCert ONE were not affected, and that no certificate was issued, validated differently or revoked because of the incident. DigiCert has not published the number of people or documents affected. Figures are as of the November 5, 2026 coverage and may change.",
-        "attackChain": [
-          {
-            "stage": "Initial Access",
-            "description": "In plain English: an internal system was left open to the internet and a sign-up feature let outsiders create accounts. On February 4, 2025 DigiCert moved the business system from a network segment restricted by a VPN to another availability zone, which accidentally made it internet-accessible without a security review. An account registration feature meant for other uses of the account management platform also became available, and accounts created through it were not covered by the multi-factor authentication required for staff."
-          },
-          {
-            "stage": "Execution",
-            "description": "A newly registered account with no application assigned could still read archived customer information because of a gap in permission checks. DigiCert's investigation found that unauthorized data access took place between June 27 and July 2, 2026. The account could read records but could not change them, approve identity checks or issue certificates."
-          },
-          {
-            "stage": "Persistence",
-            "description": "Not publicly confirmed beyond the registration path. A web application firewall blocked new registrations through the external access path after staff noticed non-DigiCert accounts on June 18, 2026, but existing access remained a concern until an authorization fix was released on July 2. DigiCert's report does not describe any backdoors."
-          },
-          {
-            "stage": "Impact",
-            "description": "Confidentiality: names, business email addresses, phone numbers and business addresses from archived records, and for a small minority of customer accounts passports, driver's licenses, utility bills or other documents showing names and addresses. Integrity and availability: DigiCert reports no certificate issuance, validation changes or revocation activity linked to the unauthorized account, and says CertCentral, DigiCert ONE and certificate authority services were unaffected and that customers do not need to replace active certificates. Not stated: the number of affected people, organizations or documents."
-          }
-        ],
-        "timeline": [
-          {
-            "date": "2025-02-04",
-            "event": "DigiCert migrates the internal business system to another availability zone, accidentally exposing it to the internet without a security review."
-          },
-          {
-            "date": "2026-06-18",
-            "event": "Staff notice accounts that do not belong to DigiCert. An initial review wrongly concludes that accounts without an assigned application cannot access data. A web application firewall blocks new registrations through the external path."
-          },
-          {
-            "date": "2026-06-21",
-            "event": "A report from DigiCert's managed security research program follows, and engineers confirm the registration issue."
-          },
-          {
-            "date": "2026-06-27",
-            "event": "Start of the window in which investigators later established that unauthorized data access took place; it ends on July 2."
-          },
-          {
-            "date": "2026-07-02",
-            "event": "DigiCert releases an authorization fix. It initially treated the problem as an account-creation issue rather than a data-access incident."
-          },
-          {
-            "date": "2026-10-12",
-            "event": "DigiCert first suspects access to archived information. Retained logs and audit records help investigators rebuild the access window."
-          },
-          {
-            "date": "2026-10-19",
-            "event": "DigiCert confirms unauthorized data access and files its preliminary incident report the next day, October 20."
-          },
-          {
-            "date": "2026-11-05",
-            "event": "Customer notifications reach the public through security researchers and press coverage, while DigiCert reviews identity documents to identify who was affected."
-          }
-        ],
-        "impact": "Confirmed by DigiCert: unauthorized read-only access to archived customer information, including contact details and, for a small minority of accounts, identity documents. No certificate issuance, validation changes or revocation activity were linked to the unauthorized account. Customer login credentials and issued certificates remain secure, according to DigiCert. Unknown or not stated: the number of affected people, organizations and documents, whether the data has been misused, and the identity of the person behind the unauthorized account.",
-        "response": "DigiCert disabled self-registration, moved the remaining exposed endpoints behind private network infrastructure, reset business system passwords and strengthened monitoring. It completed a permissions review, now requires security approval for network access changes, and plans further checks on external exposure and account alerts. It is reviewing the identity documents to identify affected individuals and will notify them once that review is complete, and it filed a public incident report.",
-        "rootCause": "Per DigiCert's incident report, the central failure was that newly registered accounts could read sensitive records. Two conditions combined: an infrastructure migration that accidentally exposed the internal system to the internet without a security review, and a registration feature that created accounts outside the multi-factor authentication required for staff, with a gap in permission checks. DigiCert's own lesson is that internal tools need explicit authorization checks even when network restrictions are expected to protect them.",
-        "observations": {
-          "lessons": [
-            "Lesson 1: Network location is not authorization. The system was meant to sit behind a VPN, and when that protection silently disappeared nothing else stopped outsiders from reading data.",
-            "Lesson 2: Infrastructure changes need a security review. A migration to another availability zone changed the system's exposure, and no one reviewed the new exposure.",
-            "Lesson 3: Unused features become attack paths. A registration feature meant for other uses created accounts that skipped multi-factor authentication.",
-            "Lesson 4: Triage assumptions can be wrong. Staff first concluded that accounts with no application could not read data, and the issue was treated as an account-creation problem for months before it was recognized as a data-access incident.",
-            "Lesson 5: Retained logs make late investigations possible. Audit records let DigiCert rebuild the access window and show that the account could read but not change data or issue certificates."
+          "slug": "emudhra-ca-key-compromise-java-emergency-update-2026-10-20",
+          "title": "eMudhra's CA keys were cracked in milliseconds, and Oracle ships emergency Java updates to distrust them",
+          "date": "2026-10-20",
+          "category": "Certificate Authority Compromise / Java Trust Store",
+          "sourceName": "Mozilla CA Incident Report (Bugzilla 2083449)",
+          "sourceUrl": "https://bugzilla.mozilla.org/show_bug.cgi?id=2083449",
+          "image": "assets/images/emudhra-java.png",
+          "summary": "In plain English: a certificate authority (CA) is a company that browsers and programs trust to vouch for websites. eMudhra, an Indian CA, created eight intermediate CA certificates in April 2025 using badly generated private keys. The keys were so weak that anyone could work them out from the public certificates in moments. Whoever holds such a key can mint a fake HTTPS certificate for any website, and software that trusts eMudhra's chain would accept it. A researcher reported the problem on October 17, 2026, and Mozilla made it public on October 20. Chrome and Firefox blocked the certificates the same evening, and Apple and Microsoft followed within days. Java and many other non-browser tools do not check revocation or Certificate Transparency by default, so Oracle issued emergency Java updates that remove trust in the affected certificates. Six of the eight intermediates issued TLS certificates and two were for code signing. No fraudulent certificate had been logged in Certificate Transparency when Chrome blocked the keys, but the keys are public, so non-browser clients remain the exposed group until they are updated. Figures and CVE identifiers are as of November 10, 2026 and may change.",
+          "attackChain": [
+            {
+              "stage": "Initial Access",
+              "description": "There was no break-in. In plain English: the weakness was built into the keys themselves. eMudhra says a script error caused its issuing CAs to be created with weak keys. Mozilla's report describes the P-384 private keys of the eight intermediates as tiny integers that can be recovered almost instantly, and Cisco Talos describes several as single-digit or double-digit numbers instead of the 384 bits of randomness expected. Anyone with the public certificates could derive the private keys."
+            },
+            {
+              "stage": "Execution",
+              "description": "A security researcher recovered the keys and reported them on October 17, 2026, along with proof that the keys were in third-party hands (a message signed with each intermediate's private key). Mozilla says several people independently recovered the keys, and researchers have since published them. One researcher also reported recovering the keys with a simple prompt to an AI agent. No source reviewed confirms that anyone used the keys to attack a real target."
+            },
+            {
+              "stage": "Persistence",
+              "description": "The risk lasts as long as software still trusts the eMudhra chain. Browsers pushed blocks quickly (Chrome through a CRLSet update on the evening of October 17, Mozilla through OneCRL), but many non-browser clients such as curl, Python, Node, Go and Java trust a CA bundle stored on disk and, by default, do not check revocation or Certificate Transparency. Frozen snapshots of older root stores, container images and bundled JDKs can keep the old trust. Oracle's Java advisory covers Java SE 8, 11, 17, 21, 25 and 27 plus GraalVM, and it was later expanded to products that bundle or embed Java."
+            },
+            {
+              "stage": "Impact",
+              "description": "Potential impact: an attacker holding a key could issue a certificate for any website or service and intercept or tamper with encrypted traffic from clients that still trust the chain, for example a Java application connecting to an API or a build server downloading dependencies. Two of the eight intermediates were for code signing. Confirmed: browsers blocked the six TLS intermediates, and Chrome reported that none of them had issued any certificate logged to Certificate Transparency before the block, so Certificate Transparency-enforcing browsers could not have been attacked. Not confirmed: whether anyone abused the keys against clients that do not check Certificate Transparency."
+            }
           ],
-          "recommendations": [
-            "Recommendation 1: Run an external exposure check after every network or hosting change, and scan regularly for internal systems that have become reachable from the internet.",
-            "Recommendation 2: Enforce authorization on every read, with default-deny roles, so an account with no assigned role or application can see nothing.",
-            "Recommendation 3: Disable self-registration on internal tools, or require approval and multi-factor authentication for every account created, not only for staff accounts.",
-            "Recommendation 4: Alert on unfamiliar accounts, and treat them as potential data-access incidents until logs prove otherwise.",
-            "Recommendation 5: Keep long-lived access and audit logs, and minimize archived identity documents, since data you no longer store cannot be exposed."
+          "timeline": [
+            {
+              "date": "2025-04-01",
+              "event": "eMudhra creates the eight intermediate CA certificates with the weak keys (April 2025, according to Endor Labs' analysis of the incident)."
+            },
+            {
+              "date": "2026-10-17",
+              "event": "A researcher reports the compromised keys to Apple, Google, Microsoft, Mozilla and eMudhra. Chrome blocks the six TLS intermediates by CRLSet at about 19:45 UTC. Mozilla receives the report at 20:06 UTC and starts blocking through OneCRL."
+            },
+            {
+              "date": "2026-10-20",
+              "event": "Mozilla and Chrome's Root Program publish the incident. Mozilla removes the eMudhra root in an NSS update and Microsoft blocks the certificates. eMudhra also revoked the intermediates (it says within 14 hours of confirming the issue), and fixes such as the Composer ca-bundle update appear."
+            },
+            {
+              "date": "2026-10-21",
+              "event": "Oracle publishes an emergency Java security alert that distrusts the affected intermediate certificates. Japan's IPA warns that exploitation could crash applications or let an attacker take control of a computer."
+            },
+            {
+              "date": "2026-10-24",
+              "event": "Oracle's advisory for the JSSE flaw (CVSS 9.1, remotely exploitable without authentication) lists Java SE 8u511, 11.0.33, 17.0.21, 21.0.13, 25.0.5 and 27.0.1 plus GraalVM. Oracle expands the advisory on October 30 to products that bundle Java."
+            },
+            {
+              "date": "2026-10-26",
+              "event": "eMudhra publishes a statement from its leadership saying the flaw was its own, caused by a script error, and that the root keys were not affected."
+            }
+          ],
+          "impact": "Confirmed: private keys of eight eMudhra intermediate CA certificates (six for TLS, two for code signing) were recoverable by anyone and have been published. Chrome, Firefox, Apple and Microsoft blocked them, eMudhra revoked them, and Oracle shipped Java updates that remove trust in them. Chrome found no certificates from the six TLS intermediates logged in Certificate Transparency before its block. Oracle's advisory rates the Java issue CVSS 9.1. Sources reviewed do not say that attackers exploited the Java issue in the wild. Unknown: whether the keys were abused against clients that do not check revocation or Certificate Transparency, and how many Java deployments, container images and embedded products still trust the old chain. Note on identifiers: Oracle's own alert page lists CVE-2026-114820, while several outlets cite CVE-2026-91403 for the October 21 alert, so check Oracle's page for the current identifier.",
+          "response": "Chrome blocked the six TLS intermediates within hours, Mozilla blocked them through OneCRL and later removed the root, and Apple and Microsoft followed. eMudhra revoked the intermediates and published a statement taking responsibility. Oracle released emergency Java updates for Java SE 8 through 27 and GraalVM that stop trusting the affected certificates, and later widened the advisory to products embedding Java. Other ecosystems shipped fixes too, including a Go crypto/x509 change tracked as CVE-2026-111943 and a refreshed Composer ca-bundle.",
+          "rootCause": "The root cause is a defect in how eMudhra generated the private keys for eight intermediate CAs. eMudhra attributes it to a script error. The keys had almost no randomness, so they could be recovered from the public certificates. Why the error was not caught during key generation or issuance has not been fully explained in the sources reviewed.",
+          "observations": {
+            "lessons": [
+              "Lesson 1: A trusted certificate chain is only as strong as the weakest key in it. The weak keys were created in April 2025 and the problem surfaced only in October 2026 after a researcher scanned public certificates.",
+              "Lesson 2: Browsers and Java do not get protected at the same speed. Chrome and Firefox pushed blocks within hours, but Java needed a runtime update, because many non-browser clients trust a file on disk and skip revocation and Certificate Transparency checks.",
+              "Lesson 3: Java runtimes hide in many places. The advisory was expanded to products that bundle Java, so patching the JDK on a laptop does not cover container images, vendor appliances or custom trust stores.",
+              "Lesson 4: Certificate Transparency made the difference for browsers. No certificate from the six TLS intermediates had been logged before the block, which is why CT-enforcing browsers could not have been attacked.",
+              "Lesson 5: Public disclosure moves fast. Mozilla says several people independently recovered the keys, and they were published within days, which shrinks the time defenders have to update."
+            ],
+            "recommendations": [
+              "Recommendation 1: Apply the October 2026 Oracle Java updates (or the matching OpenJDK vendor builds) and rebuild container images and bundled runtimes, so every JVM that your applications use distrusts the eMudhra intermediates.",
+              "Recommendation 2: Inventory every Java trust store (the cacerts file, custom truststores and bundled JREs in vendor products) and compare them against the distrust list, since frozen older root stores can still carry the old chain.",
+              "Recommendation 3: Where services make sensitive outbound connections, consider enabling revocation checking in the Java client (for example the OCSP and CRL settings) and certificate pinning for high-value endpoints.",
+              "Recommendation 4: Monitor Certificate Transparency logs for certificates issued for your own domains, and alert on unexpected issuers or unlogged certificates.",
+              "Recommendation 5: Add CA-compromise scenarios to your vulnerability management and incident response plans, with a tested way to push trust-store changes quickly across servers, containers and endpoints."
+            ]
+          }
+        },
+        {
+          "slug": "fireworks-ai-cloud-provider-breach-2026-11-09",
+          "title": "Fireworks AI says attackers reached its development machines through a third-party cloud provider, widening an October breach",
+          "date": "2026-11-09",
+          "category": "Cloud Provider Compromise / AI Platform Breach",
+          "sourceName": "Cyber Security News (reporting Fireworks AI's security bulletin)",
+          "sourceUrl": "https://cybersecuritynews.com/fireworks-ai-data-breach/",
+          "image": "assets/images/fireworks-ai.png",
+          "summary": "In plain English: Fireworks AI, a company that hosts and runs AI models for customers, first reported in October that an attacker misused its internal credentials. On November 9, 2026 it said the incident was wider. A cloud provider that hosts its research and development machines had its own security incident on October 23, and on October 24 an unauthorized party used that opening to reach Fireworks development machines and run an unauthorized workload. Fireworks now confirms that attackers also saw customer account and billing details and, for some customers, parts of unfinished model weights and datasets. Fireworks says payment card numbers are not stored and that its Inference, Training SDK and Nexus services showed no impact. Its evidence points to a financially motivated group that sells access to large language models, a practice called LLMjacking. The cloud provider has not been named, and the investigation continues. Figures are as of the November 9, 2026 update and may change.",
+          "attackChain": [
+            {
+              "stage": "Initial Access",
+              "description": "Two openings are described. First, on October 6 Fireworks detected misuse of internal credentials; how the attacker obtained them has not been disclosed. Second, on October 23 a third-party cloud provider that hosts Fireworks research and development machines had a security incident, and on October 24 an unauthorized party used that to reach Fireworks development machines. The provider has not been named and the specific vulnerabilities have not been disclosed."
+            },
+            {
+              "stage": "Execution",
+              "description": "In the first phase, the attacker read environment variables used by evaluation jobs, which could have exposed API keys and tokens. In the second phase, the attacker ran an unauthorized workload on the development machines, which led to further customer data exposure. Fireworks says it detected the second activity on the day it happened and closed known critical vulnerabilities."
+            },
+            {
+              "stage": "Persistence",
+              "description": "Not publicly confirmed. Fireworks says it detected no further successful attacker access to its customer platform as of October 25. It revoked affected API keys, employee credentials and service-account tokens, replaced credentials, reduced elevated permissions, isolated affected systems and tightened storage access. How long the attacker held access in total has not been published."
+            },
+            {
+              "stage": "Impact",
+              "description": "Confidentiality: resource identifiers, names, descriptions and creation times from an internal application; billing and shipping addresses, invoices, payment history, balances and credit usage; and, for certain customers, a subset of incomplete model weights and datasets. Fireworks says it does not store payment card numbers, so those were not affected, and it reports no impact on Inference, Training SDK or Nexus, which run with zero data retention by default. The disclosure does not establish that complete production models were stolen. Fireworks has disabled self-service dataset uploads and downloads for Batch Inference and dataset-based training while it investigates."
+            }
+          ],
+          "timeline": [
+            {
+              "date": "2026-10-06",
+              "event": "Fireworks detects misuse of internal credentials. Attackers accessed environment variables used by evaluation jobs, potentially capturing API keys and tokens."
+            },
+            {
+              "date": "2026-10-07",
+              "event": "Fireworks begins notifying customers and later revokes affected keys, employee credentials and service-account tokens."
+            },
+            {
+              "date": "2026-10-23",
+              "event": "A cloud provider that hosts Fireworks research and development machines experiences a security incident."
+            },
+            {
+              "date": "2026-10-24",
+              "event": "An unauthorized party uses that opening to access Fireworks development machines and run an unauthorized workload. Fireworks detects the activity the same day and responds."
+            },
+            {
+              "date": "2026-10-25",
+              "event": "Fireworks reports no further detected successful attacker access to its customer platform."
+            },
+            {
+              "date": "2026-11-09",
+              "event": "Fireworks publishes an updated bulletin confirming wider customer data exposure, including billing information and parts of incomplete model weights and datasets, and says it has brought in Palo Alto Networks Unit 42 and notified law enforcement."
+            }
+          ],
+          "impact": "Confirmed by Fireworks: customer account metadata and billing information exposed; a subset of incomplete model weights and datasets accessed for certain customers; API keys and tokens potentially exposed in the earlier phase. Fireworks says payment card numbers are not stored and that Inference, Training SDK and Nexus were not affected. Unknown or not stated: the number of affected customers, the name of the cloud provider, how the internal credentials were first obtained, and whether the two phases were one continuous intrusion.",
+          "response": "Fireworks notified law enforcement, engaged Palo Alto Networks Unit 42 for forensics, revoked and replaced credentials, reduced elevated permissions, isolated affected systems and tightened storage access. It is notifying affected customers directly and advises them to replace revoked Fireworks keys, rotate any exposed third-party credentials with their issuing providers (deleting a stored secret does not invalidate the credential itself), and review access logs, users, API keys, training jobs and datasets for unfamiliar activity. It disabled self-service dataset uploads and downloads for Batch Inference and dataset-based training, and moved Fireworks Lab training runs into an isolated environment with extra network and storage protection.",
+          "rootCause": "The root cause has not been publicly confirmed. Fireworks attributes the second phase to a security incident at a third-party cloud provider hosting its research and development machines, and the first phase to misuse of internal credentials. It has not named the provider or described the weaknesses involved. Fireworks says its evidence points to a financially motivated group seeking to sell access to large language models through illicit routing gateways.",
+          "observations": {
+            "lessons": [
+              "Lesson 1: A breach can be wider than the first disclosure. Fireworks first reported exposed secrets in evaluation jobs and later found a second path that exposed customer data, so early scoping needs to stay open.",
+              "Lesson 2: Your provider's incident becomes your incident. The second phase began with a security problem at a cloud provider hosting development machines, which shows why third-party risk includes the infrastructure you run on.",
+              "Lesson 3: Environment variables are a rich target. Evaluation jobs held API keys and tokens, and one read of those variables can unlock many other systems.",
+              "Lesson 4: Customers inherit the clean-up. Deleting a stored secret does not invalidate it, so customers have to rotate credentials with the original issuer.",
+              "Lesson 5: Stolen AI and cloud access has a resale market. Fireworks' evidence points to LLMjacking, where access to paid models is sold through routing gateways, so stolen credentials can show up as unexpected usage bills."
+            ],
+            "recommendations": [
+              "Recommendation 1: Keep secrets out of long-lived environment variables where possible. Use a secrets manager with short-lived, narrowly scoped tokens, and rotate quickly when any exposure is suspected.",
+              "Recommendation 2: Treat development and research machines as production-adjacent. Apply least privilege, network isolation and logging, and limit what a compromised host or provider account can reach.",
+              "Recommendation 3: Monitor for unexpected workloads and usage, such as new jobs, unfamiliar users, unusual API usage and cost spikes, and set billing alerts as an early warning for stolen credentials.",
+              "Recommendation 4: Review third-party and cloud-provider dependencies, including how the provider notifies you of its own incidents and what access its staff and systems have to your machines.",
+              "Recommendation 5: When a vendor reports an incident, rotate the credentials you gave it with their original issuers, and review access logs, API keys, users, jobs and datasets for activity you do not recognize."
+            ]
+          }
+        },
+        {
+          "slug": "digicert-archived-data-exposure-2026-11-05",
+          "title": "DigiCert confirms an exposed internal system leaked customer contact details and identity documents",
+          "date": "2026-11-05",
+          "category": "Data Breach / Misconfigured Internal System",
+          "sourceName": "Cyber Security News (reporting DigiCert's incident report)",
+          "sourceUrl": "https://cybersecuritynews.com/digicert-confirms-data-breach/",
+          "image": "assets/images/digicert.png",
+          "summary": "In plain English: DigiCert, one of the world's largest certificate authorities, moved an internal business system in February 2025, and the move accidentally made it reachable from the internet. The system also allowed anyone to register an account, and those accounts were not forced to use the multi-factor authentication required for staff. Accounts with no application assigned still received read-only access to archived customer information. Investigators found that unauthorized access happened between June 27 and July 2, 2026, and DigiCert confirmed the data access on October 19, 2026. Exposed data includes names, business email addresses, phone numbers and business addresses, and for a small minority of accounts passports, driver's licenses, utility bills or other documents showing names and addresses. DigiCert says its certificate authority services, CertCentral and DigiCert ONE were not affected, and that no certificate was issued, validated differently or revoked because of the incident. DigiCert has not published the number of people or documents affected. Figures are as of the November 5, 2026 coverage and may change.",
+          "attackChain": [
+            {
+              "stage": "Initial Access",
+              "description": "In plain English: an internal system was left open to the internet and a sign-up feature let outsiders create accounts. On February 4, 2025 DigiCert moved the business system from a network segment restricted by a VPN to another availability zone, which accidentally made it internet-accessible without a security review. An account registration feature meant for other uses of the account management platform also became available, and accounts created through it were not covered by the multi-factor authentication required for staff."
+            },
+            {
+              "stage": "Execution",
+              "description": "A newly registered account with no application assigned could still read archived customer information because of a gap in permission checks. DigiCert's investigation found that unauthorized data access took place between June 27 and July 2, 2026. The account could read records but could not change them, approve identity checks or issue certificates."
+            },
+            {
+              "stage": "Persistence",
+              "description": "Not publicly confirmed beyond the registration path. A web application firewall blocked new registrations through the external access path after staff noticed non-DigiCert accounts on June 18, 2026, but existing access remained a concern until an authorization fix was released on July 2. DigiCert's report does not describe any backdoors."
+            },
+            {
+              "stage": "Impact",
+              "description": "Confidentiality: names, business email addresses, phone numbers and business addresses from archived records, and for a small minority of customer accounts passports, driver's licenses, utility bills or other documents showing names and addresses. Integrity and availability: DigiCert reports no certificate issuance, validation changes or revocation activity linked to the unauthorized account, and says CertCentral, DigiCert ONE and certificate authority services were unaffected and that customers do not need to replace active certificates. Not stated: the number of affected people, organizations or documents."
+            }
+          ],
+          "timeline": [
+            {
+              "date": "2025-02-04",
+              "event": "DigiCert migrates the internal business system to another availability zone, accidentally exposing it to the internet without a security review."
+            },
+            {
+              "date": "2026-06-18",
+              "event": "Staff notice accounts that do not belong to DigiCert. An initial review wrongly concludes that accounts without an assigned application cannot access data. A web application firewall blocks new registrations through the external path."
+            },
+            {
+              "date": "2026-06-21",
+              "event": "A report from DigiCert's managed security research program follows, and engineers confirm the registration issue."
+            },
+            {
+              "date": "2026-06-27",
+              "event": "Start of the window in which investigators later established that unauthorized data access took place; it ends on July 2."
+            },
+            {
+              "date": "2026-07-02",
+              "event": "DigiCert releases an authorization fix. It initially treated the problem as an account-creation issue rather than a data-access incident."
+            },
+            {
+              "date": "2026-10-12",
+              "event": "DigiCert first suspects access to archived information. Retained logs and audit records help investigators rebuild the access window."
+            },
+            {
+              "date": "2026-10-19",
+              "event": "DigiCert confirms unauthorized data access and files its preliminary incident report the next day, October 20."
+            },
+            {
+              "date": "2026-11-05",
+              "event": "Customer notifications reach the public through security researchers and press coverage, while DigiCert reviews identity documents to identify who was affected."
+            }
+          ],
+          "impact": "Confirmed by DigiCert: unauthorized read-only access to archived customer information, including contact details and, for a small minority of accounts, identity documents. No certificate issuance, validation changes or revocation activity were linked to the unauthorized account. Customer login credentials and issued certificates remain secure, according to DigiCert. Unknown or not stated: the number of affected people, organizations and documents, whether the data has been misused, and the identity of the person behind the unauthorized account.",
+          "response": "DigiCert disabled self-registration, moved the remaining exposed endpoints behind private network infrastructure, reset business system passwords and strengthened monitoring. It completed a permissions review, now requires security approval for network access changes, and plans further checks on external exposure and account alerts. It is reviewing the identity documents to identify affected individuals and will notify them once that review is complete, and it filed a public incident report.",
+          "rootCause": "Per DigiCert's incident report, the central failure was that newly registered accounts could read sensitive records. Two conditions combined: an infrastructure migration that accidentally exposed the internal system to the internet without a security review, and a registration feature that created accounts outside the multi-factor authentication required for staff, with a gap in permission checks. DigiCert's own lesson is that internal tools need explicit authorization checks even when network restrictions are expected to protect them.",
+          "observations": {
+            "lessons": [
+              "Lesson 1: Network location is not authorization. The system was meant to sit behind a VPN, and when that protection silently disappeared nothing else stopped outsiders from reading data.",
+              "Lesson 2: Infrastructure changes need a security review. A migration to another availability zone changed the system's exposure, and no one reviewed the new exposure.",
+              "Lesson 3: Unused features become attack paths. A registration feature meant for other uses created accounts that skipped multi-factor authentication.",
+              "Lesson 4: Triage assumptions can be wrong. Staff first concluded that accounts with no application could not read data, and the issue was treated as an account-creation problem for months before it was recognized as a data-access incident.",
+              "Lesson 5: Retained logs make late investigations possible. Audit records let DigiCert rebuild the access window and show that the account could read but not change data or issue certificates."
+            ],
+            "recommendations": [
+              "Recommendation 1: Run an external exposure check after every network or hosting change, and scan regularly for internal systems that have become reachable from the internet.",
+              "Recommendation 2: Enforce authorization on every read, with default-deny roles, so an account with no assigned role or application can see nothing.",
+              "Recommendation 3: Disable self-registration on internal tools, or require approval and multi-factor authentication for every account created, not only for staff accounts.",
+              "Recommendation 4: Alert on unfamiliar accounts, and treat them as potential data-access incidents until logs prove otherwise.",
+              "Recommendation 5: Keep long-lived access and audit logs, and minimize archived identity documents, since data you no longer store cannot be exposed."
             ]
           }
         }
       ]
-     ]
     }
   ]
 }
