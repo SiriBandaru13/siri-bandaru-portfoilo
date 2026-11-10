@@ -11,9 +11,10 @@ async function init(){
  function renderEdition(e){
   if(!e||!latest)return;activeEdition=e;activeStories=(e.stories||[]).slice(0,5);
   const visibleStories=activeStories.filter(s=>currentFilter==='all'||String(s.category||'').toLowerCase().includes(currentFilter));
-  latest.innerHTML=`<div class="edition-head"><div><span class="section-kicker">${esc(e.date||'')}</span><h2>${esc(e.title||'Security briefing')}</h2></div><span class="edition-count">${activeStories.length} / 5 STORIES</span></div>`+
+  latest.innerHTML=`<div class="edition-head"><div><span class="section-kicker">${esc(e.date||'')}</span><h2>${esc(e.title||'Security briefing')}</h2></div>
+  <span class="edition-count">${activeStories.length} / 5 STORIES</span></div>`+(current&&e.id!==current.id?`<button type="button" class="back-current" data-back- current>← Back to current edition</button>`:'')+
    (visibleStories.length?`<div class="storygrid">${visibleStories.map((s)=>`<button class="storycard" type="button" data-story-index="${activeStories.indexOf(s)}" aria-label="Open ${esc(s.title)}"><div class="story-thumb">${imageMarkup(s)}</div><div class="story-card-copy"><small>${esc(s.category||'SECURITY')} · ${esc(s.date||e.date||'')}</small><h3>${esc(s.title||'Untitled incident')}</h3><span class="card-open">OPEN FIELD NOTE <b>↗</b></span></div></button>`).join('')}</div>`:`<div class="empty"><h2>No stories in this edition yet.</h2><p>Add up to five researched stories to this edition in data/news.json.</p></div>`);
-  latest.querySelectorAll('[data-story-index]').forEach(b=>b.addEventListener('click',()=>openStory(Number(b.dataset.storyIndex))));
+  latest.querySelector('[data-back-current]')?.addEventListener('click',()=> {renderEdition(current);renderArchive();latest.scrollIntoView({behavior:'smooth',block:'start'})});
  }
  function renderArchive(){
   if(!archive)return;const old=editions.filter(e=>!current||e.id!==current.id);
