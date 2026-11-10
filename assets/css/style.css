@@ -144,3 +144,6 @@ body.modal-open{overflow:hidden}
 .journal-filter{border:1px solid var(--line);background:#ffffff06;color:var(--muted);padding:9px 13px;border-radius:99px;font:10px var(--mono);cursor:pointer;transition:.2s}
 .journal-filter:hover,.journal-filter.active{border-color:var(--violet);color:var(--sage);background:#9c7bcb16}
 @media(max-width:760px){.resume-cards{grid-template-columns:1fr}.journal-filters{padding:18px 7vw 0}}
+
+.back-current{display:inline-block;margin:0 0 1.2rem;padding:.5rem .9rem;background:none;border:1px solid currentColor;border-radius:999px;color:inherit;font:inherit;font-size:.8rem;letter-spacing:.05em;cursor:pointer;opacity:.85}
+.back-current:hover{opacity:1}
