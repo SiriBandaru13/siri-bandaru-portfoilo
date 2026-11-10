@@ -1,7 +1,7 @@
 async function init(){
  let data;try{data=await(await fetch('data/news.json')).json()}catch{return}
  const editions=(data.editions||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
- let current=editions[0],
+ let current=editions[0],activeEdition=current,activeStories=[],activeIndex=0,currentFilter='all';
  const latest=document.getElementById('latest'),archive=document.getElementById('archive');
  const modal=document.getElementById('storyModal'),modalContent=document.getElementById('modalContent');
  document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{currentFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));if(activeEdition)renderEdition(activeEdition)}));
@@ -11,15 +11,13 @@ async function init(){
  function renderEdition(e){
   if(!e||!latest)return;activeEdition=e;activeStories=(e.stories||[]).slice(0,5);
   const visibleStories=activeStories.filter(s=>currentFilter==='all'||String(s.category||'').toLowerCase().includes(currentFilter));
-  latest.innerHTML=`<div class="edition-head"><div><span class="section-kicker">${esc(e.date||'')}</span><h2>${esc(e.title||'Security briefing')}</h2></div>
-<span class="edition-count">${activeStories.length} / 5 STORIES</span></div>`+
+  latest.innerHTML=`<div class="edition-head"><div><span class="section-kicker">${esc(e.date||'')}</span><h2>${esc(e.title||'Security briefing')}</h2></div><span class="edition-count">${activeStories.length} / 5 STORIES</span></div>`+
    (visibleStories.length?`<div class="storygrid">${visibleStories.map((s)=>`<button class="storycard" type="button" data-story-index="${activeStories.indexOf(s)}" aria-label="Open ${esc(s.title)}"><div class="story-thumb">${imageMarkup(s)}</div><div class="story-card-copy"><small>${esc(s.category||'SECURITY')} · ${esc(s.date||e.date||'')}</small><h3>${esc(s.title||'Untitled incident')}</h3><span class="card-open">OPEN FIELD NOTE <b>↗</b></span></div></button>`).join('')}</div>`:`<div class="empty"><h2>No stories in this edition yet.</h2><p>Add up to five researched stories to this edition in data/news.json.</p></div>`);
-    latest.querySelectorAll('[data-story-index]').forEach(b=>b.addEventListener('click',()=>openStory(Number(b.dataset.storyIndex))));
+  latest.querySelectorAll('[data-story-index]').forEach(b=>b.addEventListener('click',()=>openStory(Number(b.dataset.storyIndex))));
  }
  function renderArchive(){
- if(!archive)return;
-archive.innerHTML=editions.length?`<div class="archive-list">${editions.map(e=>{const isCurrent=current&&e.id===current.id;return `<button type="button" class="archive-item ${activeEdition&&activeEdition.id===e.id?'selected':''}" data-edition="${esc(e.id)}"><span><small>${esc(e.date||'')}${isCurrent?' · CURRENT EDITION':''}</small><strong>${esc(e.title||'Security edition')}</strong></span><span class="archive-arrow">↗</span></button>`}).join('')}</div>`:'<p class="archive-empty">Older editions will appear here as you publish them.</p>';
-${activeEdition&&activeEdition.id===e.id?'selected':''}" data-edition="${esc(e.id)}"><span><small>${esc(e.date||'')}</small><strong>${esc(e.title||'Security edition')}</strong></span><span class="archive-arrow">↗</span></button>`).join('')}</div>`:'<p class="archive-empty">Older editions will appear here as you publish them.</p>';
+  if(!archive)return;
+  archive.innerHTML=editions.length?`<div class="archive-list">${editions.map(e=>{const isCurrent=current&&e.id===current.id;return `<button type="button" class="archive-item ${activeEdition&&activeEdition.id===e.id?'selected':''}" data-edition="${esc(e.id)}"><span><small>${esc(e.date||'')}${isCurrent?' · CURRENT EDITION':''}</small><strong>${esc(e.title||'Security edition')}</strong></span><span class="archive-arrow">↗</span></button>`}).join('')}</div>`:'<p class="archive-empty">Older editions will appear here as you publish them.</p>';
   archive.querySelectorAll('[data-edition]').forEach(b=>b.addEventListener('click',()=>{const e=editions.find(x=>x.id===b.dataset.edition);if(e){renderEdition(e);renderArchive();document.getElementById('latest')?.scrollIntoView({behavior:'smooth',block:'start'})}}));
  }
  function openStory(i){if(!activeStories.length)return;activeIndex=(i+activeStories.length)%activeStories.length;renderModal();modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');modal.querySelector('.modal-close')?.focus()}
