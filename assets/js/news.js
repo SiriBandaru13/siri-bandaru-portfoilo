@@ -1,7 +1,7 @@
 async function init(){
  let data;try{data=await(await fetch('data/news.json')).json()}catch{return}
  const editions=(data.editions||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
- let current=editions.find(e=>e.id===data.currentEdition)||editions[0],activeEdition=current,activeStories=[],activeIndex=0,currentFilter='all';
+ let current=editions[0],
  const latest=document.getElementById('latest'),archive=document.getElementById('archive');
  const modal=document.getElementById('storyModal'),modalContent=document.getElementById('modalContent');
  document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{currentFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));if(activeEdition)renderEdition(activeEdition)}));
